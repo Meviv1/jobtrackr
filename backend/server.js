@@ -27,7 +27,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
-import jobRoutes from './routes/jobRoutes.js';
+import jobRoutes from "./routes/jobRoutes.js";
 
 dotenv.config();
 
@@ -36,31 +36,38 @@ const app = express();
 // ✅ Correct CORS config
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://jobtracko.vercel.app"
+  "https://jobtracko.vercel.app",
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // ✅ Parse JSON body
 app.use(express.json());
-
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/job", jobRoutes);
 
+// ✅ Test Route
+app.get("/test", (req, res) => {
+  res.send("✅ CORS working — this is the latest deployment");
+});
+
 // ✅ MongoDB + Start server
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
     app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
   })
